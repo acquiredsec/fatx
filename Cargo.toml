@@ -1,0 +1,27 @@
+[package]
+name = "fatx"
+version = "0.1.0"
+edition = "2021"
+authors = ["Brad Roughan <bradroughan@gmail.com>"]
+license = "MIT"
+description = "FATx: Pure Rust FAT12/16/32 filesystem parser for forensic analysis"
+repository = "https://github.com/acquiredsec/fatx"
+
+[lib]
+name = "fatx"
+path = "src/lib.rs"
+
+[[bin]]
+name = "fatx"
+path = "src/bin/fatx.rs"
+
+[dependencies]
+fatfs = { version = "0.3", features = ["chrono"] }
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+chrono = "0.4"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[dev-dependencies]
+tempfile = "3"
