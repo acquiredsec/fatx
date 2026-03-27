@@ -61,7 +61,7 @@ impl<T: Read + Seek + std::fmt::Debug> ExfatVolume<T> {
         let adapter = Arc::new(ReadSeekAdapter::new(source));
         let root = Root::open(adapter.clone())
             .map_err(|e| anyhow::anyhow!("Failed to open exFAT: {:?}", e))?;
-        let label = root.label().map(|l| format!("{:?}", l)).unwrap_or_default();
+        let label = root.label().map(|l| l.to_string().trim().to_string()).unwrap_or_default();
         Ok(Self { adapter, info: ExfatVolumeInfo { label } })
     }
 
