@@ -96,7 +96,13 @@ impl<T: Read + Seek + std::fmt::Debug> ExfatVolume<T> {
     }
 
     fn list_recursive(&self, path: &str, out: &mut Vec<FatEntry>) -> Result<()> {
-        let entries = self.list_dir(path)?;
+        let entries = match self.list_dir(path) {
+            Ok(e) => e,
+            Err(e) => {
+                eprintln!("Warning: skipping unreadable directory '{}': {}", path, e);
+                return Ok(()); // skip unreadable directories
+            }
+        };
         for entry in &entries {
             out.push(entry.clone());
             if entry.is_directory {
@@ -141,8 +147,13 @@ fn navigate_to_dir<O: ReadOffset + std::fmt::Debug>(
     for item in items.iter_mut() {
         if let FsElement::D(ref dir) = item {
             if dir.name() == target {
-                let children = dir.open()
-                    .map_err(|e| anyhow::anyhow!("Failed to open dir '{}': {:?}", target, e))?;
+                let children = match dir.open() {
+                    Ok(c) => c,
+                    Err(e) => {
+                        eprintln!("Warning: cannot open dir '{}': {:?}", target, e);
+                        return Ok(Vec::new());
+                    }
+                };
                 if depth + 1 >= parts.len() {
                     return Ok(children);
                 } else {
